@@ -1,0 +1,60 @@
+#init.rc for vivo
+
+#vivo_daemon added by zhangmingkai
+service vivo_daemon /system/bin/vivo_daemon
+    class main
+on post-fs-data
+    start vivo_daemon
+
+#settings_team added start
+service firewall /data/data/com.iqoo.secure.datausage/app_bin/droidwall.sh
+    disabled
+    user root
+    oneshot
+
+on property:sys.firewall=0
+    start firewall
+	
+service reset_phone /system/bin/sh /system/etc/reset_phone.sh
+    disabled
+    oneshot
+
+#settings_team added end
+
+#settings_team add by liuzhaohui
+service backuprestore /system/bin/br_app_data_service
+        class main
+        socket backuprestore stream 0660 root sdcard_rw
+        user root
+#end settings_team by liuzhaohui
+
+#settings_team added by liuyunyu
+
+service atcid-daemon /system/bin/atcid 
+	class late_start
+	user root 
+	group radio system
+	disabled
+	
+on property:persist.sys.bbkem=1
+	setprop persist.service.atci.usermode 1
+    start atcid-daemon 
+	
+on property:persist.sys.bbkem=0
+	setprop persist.service.atci.usermode 0
+	stop atcid-daemon
+		
+service vivo_em_svr /system/bin/vivo_em_svr 
+	class late_start
+	user root
+    group system
+service qmitest /system/bin/qmitest
+	class late_start
+	chmod 777 /dev/socket/qmitest
+	socket qmitest stream 777 root radio 
+	user root
+	group radio system
+#settings_team end
+#add by qiuguifu for MTK FLASHLIGHT
+	chmod 0777 /dev/iqoo_flashlight_platform 
+
